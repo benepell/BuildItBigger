@@ -1,0 +1,80 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.google.cloud.tools.endpoints-framework-client'
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "com.google.cloud.tools:endpoints-framework-gradle-plugin:${rootProject.ext.googleEndpointsVersion}"
+    }
+}
+
+android {
+    compileSdkVersion rootProject.sdkVersion
+
+    defaultConfig {
+        applicationId "com.udacity.gradle.builditbigger"
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.sdkVersion
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    buildTypes.each {
+        // THE  SERVER BASE ENDPOINT
+        it.buildConfigField 'String', 'ENDPOINT_URL', '\"http://10.0.2.2:8080/_ah/api/\"'
+    }
+
+    flavorDimensions "default"
+
+    productFlavors {
+        free{
+            applicationId "com.udacity.gradle.builditbigger.free"
+        }
+        paid{
+            applicationId "com.udacity.gradle.builditbigger.paid"
+        }
+    }
+
+}
+
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    endpointsServer project(path: ':backend', configuration: 'endpoints')
+
+    implementation "com.android.support:appcompat-v7:${rootProject.ext.buildVersion}"
+    implementation "com.android.support:support-v4:${rootProject.ext.buildVersion}"
+
+    freeImplementation "com.google.android.gms:play-services-ads:${rootProject.ext.gmsPlayServiceVersion}"
+
+    implementation("com.google.api-client:google-api-client:${rootProject.ext.googleApiClientVersion}") {
+        exclude group: 'org.apache.httpcomponents'
+    }
+
+    implementation("com.google.http-client:google-http-client-android:${rootProject.ext.googleHttpClientVersion}") {
+        exclude group: 'org.apache.httpcomponents'
+    }
+
+    implementation "com.google.code.findbugs:jsr305:${rootProject.ext.googleFindbugVersion}"
+
+    implementation project(":javaJoker")
+    implementation project(":androidJoker")
+
+    androidTestImplementation("com.android.support.test.espresso:espresso-core:${rootProject.ext.testEspressoVersion}", {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+
+    testImplementation "junit:junit:${rootProject.ext.testJunitVersion}"
+}

@@ -1,0 +1,63 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.0.1'
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+    }
+}
+
+ext {
+    minSdkVersion = 16
+    sdkVersion = 27
+    buildVersion = "27.0.2"
+    gmsPlayServiceVersion = "11.8.0"
+    testEspressoVersion = "3.0.1"
+    testJunitVersion = "4.12"
+    servletApiVersion = "2.5"
+    googleApiClientVersion = "1.23.0"
+    googleHttpClientVersion = "1.23.0"
+    googleFindbugVersion = "3.0.1"
+    googleEndpointsVersion = "1.0.2"
+    googleAppEngineVersion = "1.3.3"
+    googleEndpointsFramworkVersion = "2.0.11"
+    javaxInjectVersion = "1"
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+
+task testProject {
+    dependsOn(['startServer','runTests','stopServer'])
+}
+
+task startServer {
+    dependsOn ':backend:appengineRun'
+    evaluationDependsOn(":backend")
+}
+
+task runTests {
+    dependsOn ':app:connectedAndroidTest'
+    mustRunAfter "startServer"
+}
+
+task stopServer {
+    dependsOn ':backend:appengineStop'
+    mustRunAfter "runTests"
+
+}
